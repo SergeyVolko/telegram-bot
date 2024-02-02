@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.sky.telegrambot.service.BotService;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -16,9 +17,13 @@ import java.util.List;
 public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private boolean isStart = false;
 
     @Autowired
     private TelegramBot telegramBot;
+
+    @Autowired
+    private BotService service;
 
     @PostConstruct
     public void init() {
@@ -30,12 +35,27 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
             // Process your updates here
-            if ("/start".equals(update.message().text())) {
-                long chatId = update.message().chat().id();
-                String message = "Привет Мир!";
+            long chatId = update.message().chat().id();
+            String taskMessage = update.message().text();
+            if ("/start".equals(taskMessage)) {
+                String message = "Введите задачу в формате <01.01.2022 20:00 Сделать домашнюю работу>";
                 SendMessage sendMessage = new SendMessage(chatId, message);
                 telegramBot.execute(sendMessage);
+                isStart = true;
+                return;
             }
+            if (!isStart) {
+                String message = "Бот еще не стартовал.";
+                SendMessage sendMessage = new SendMessage(chatId, message);
+                telegramBot.execute(sendMessage);
+                return;
+            }
+            if (service.addTask(taskMessage, chatId)) {
+                telegramBot.execute(new SendMessage(chatId, "Задача успешно добавлена."));
+            } else {
+                telegramBot.execute(new SendMessage(chatId, "Ошибка формата ввода."));
+            }
+
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
