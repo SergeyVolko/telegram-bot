@@ -65,7 +65,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     @Scheduled(cron = "0 0/1 * * * *")
     public void run() {
-        System.out.println("Метод выполнился");
+        logger.info("Метод run() по рассписанию выполнился");
         LocalDateTime dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
         service.getTaskInMinute(dateTime).forEach(task ->
                 telegramBot.execute(new SendMessage(task.getChatId(),
