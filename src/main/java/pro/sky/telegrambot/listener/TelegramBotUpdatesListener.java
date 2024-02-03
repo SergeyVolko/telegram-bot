@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.service.BotService;
 
 import javax.annotation.PostConstruct;
@@ -20,7 +19,7 @@ import java.util.List;
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener {
 
-    private Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
     private boolean isStart = false;
 
     @Autowired
@@ -68,8 +67,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     public void run() {
         System.out.println("Метод выполнился");
         LocalDateTime dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        List<NotificationTask> tasks = service.getTaskInMinute(dateTime);
-        System.out.println(tasks);
+        service.getTaskInMinute(dateTime).forEach(task ->
+                telegramBot.execute(new SendMessage(task.getChatId(),
+                        String.format("%s %s", task.getDate(), task.getTextNotification())))
+        );
     }
 
 }
