@@ -45,7 +45,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 return;
             }
             if (!isStart) {
-                String message = "Бот еще не стартовал.";
+                String message = "Для запуска бота нажмите /start";
                 SendMessage sendMessage = new SendMessage(chatId, message);
                 telegramBot.execute(sendMessage);
                 return;
