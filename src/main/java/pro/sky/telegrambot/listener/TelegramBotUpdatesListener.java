@@ -2,6 +2,7 @@ package pro.sky.telegrambot.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.slf4j.Logger;
@@ -20,11 +21,8 @@ import java.util.List;
 public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
-    private boolean isStart = false;
-
     @Autowired
     private TelegramBot telegramBot;
-
     @Autowired
     private BotService service;
 
@@ -37,19 +35,22 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     public int process(List<Update> updates) {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
-            // Process your updates here
-            long chatId = update.message().chat().id();
-            String taskMessage = update.message().text();
-            if ("/start".equals(taskMessage)) {
-                String message = "Введите задачу в формате <01.01.2022 20:00 Сделать домашнюю работу>";
-                SendMessage sendMessage = new SendMessage(chatId, message);
-                telegramBot.execute(sendMessage);
-                isStart = true;
+            Message message = update.message();
+            if (message == null) {
+                logger.error("Received unsupported message type" + update);
                 return;
             }
-            if (!isStart) {
-                String message = "Для запуска бота нажмите /start";
-                SendMessage sendMessage = new SendMessage(chatId, message);
+            long chatId = message.chat().id();
+            String taskMessage = message.text();
+            if ("/info".equals(taskMessage)) {
+                String messageTmp = "Введите задачу в формате <01.01.2022 20:00 Сделать домашнюю работу>";
+                SendMessage sendMessage = new SendMessage(chatId, messageTmp);
+                telegramBot.execute(sendMessage);
+                return;
+            }
+            if ("/start".equals(taskMessage)) {
+                String messageTmp = "Для работы с ботом введите /info";
+                SendMessage sendMessage = new SendMessage(chatId, messageTmp);
                 telegramBot.execute(sendMessage);
                 return;
             }
