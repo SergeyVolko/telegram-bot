@@ -62,15 +62,4 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
-
-    @Scheduled(cron = "0 0/1 * * * *")
-    public void run() {
-        logger.info("Метод run() по рассписанию выполнился");
-        LocalDateTime dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        service.getTaskInMinute(dateTime).forEach(task ->
-                telegramBot.execute(new SendMessage(task.getChatId(),
-                        String.format("%s %s", task.getDate(), task.getTextNotification())))
-        );
-    }
-
 }
