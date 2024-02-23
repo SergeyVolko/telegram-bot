@@ -1,5 +1,6 @@
 package pro.sky.telegrambot.service;
 
+import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.model.NotificationTask;
@@ -21,7 +22,7 @@ public class BotServiceImp implements BotService {
     }
 
     @Override
-    public boolean addTask(String taskStr, long chatId) {
+    public SendMessage addTask(String taskStr, long chatId) {
         Matcher matcher = PATTERN.matcher(taskStr);
         boolean result = matcher.matches();
         if (result) {
@@ -30,8 +31,9 @@ public class BotServiceImp implements BotService {
             LocalDateTime localDateTime = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
             NotificationTask task = new NotificationTask(chatId, item, localDateTime);
             repository.save(task);
+            return new SendMessage(chatId, "Задача добавлена успешно");
         }
-        return result;
+        return new SendMessage(chatId, "Задача не добавлена");
     }
 
     @Override

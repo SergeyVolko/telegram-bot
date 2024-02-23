@@ -6,4 +6,7 @@ CREATE TABLE notification_task(
     chat_id INTEGER,
     text_notification TEXT,
     date TIMESTAMP
-)
+);
+
+-- changeset sergey:2
+ALTER TABLE notification_task ALTER COLUMN chat_id TYPE BIGINT;

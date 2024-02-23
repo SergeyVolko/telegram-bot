@@ -11,4 +11,6 @@ public interface NotificationTaskRepository extends JpaRepository<NotificationTa
     @Query(value = "SELECT * FROM notification_task WHERE date = ?1",
     nativeQuery = true)
     List<NotificationTask> getTaskInMinute(LocalDateTime dateTime);
+
+    List<NotificationTask> findAllByDate(LocalDateTime dateTime);
 }

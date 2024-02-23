@@ -54,12 +54,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 telegramBot.execute(sendMessage);
                 return;
             }
-            if (service.addTask(taskMessage, chatId)) {
-                telegramBot.execute(new SendMessage(chatId, "Задача успешно добавлена."));
-            } else {
-                telegramBot.execute(new SendMessage(chatId, "Ошибка формата ввода."));
-            }
-
+            telegramBot.execute(service.addTask(taskMessage, chatId));
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
